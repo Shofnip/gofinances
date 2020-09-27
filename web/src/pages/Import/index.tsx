@@ -39,7 +39,6 @@ const Import: React.FC = () => {
   }
 
   function submitFile(files: File[]): void {
-    console.log(files);
     const importedFiles = files.map(file => ({
       file,
       name: file.name,
