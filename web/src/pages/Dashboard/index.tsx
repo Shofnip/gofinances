@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FiTrash2 } from 'react-icons/fi';
 
 import income from '../../assets/income.svg';
 import outcome from '../../assets/outcome.svg';
@@ -61,6 +62,30 @@ const Dashboard: React.FC = () => {
       });
   }, []);
 
+  async function handleDeleteTransaction(id: string): Promise<void> {
+    try {
+      await api.delete(`/transactions/${id}`);
+
+      const response = await api.get('/transactions/balance');
+
+      const newBalance = response.data;
+
+      const formattedNewBalance = {
+        total: formatValue(newBalance.total),
+        income: formatValue(newBalance.income),
+        outcome: formatValue(newBalance.outcome),
+      };
+
+      setTransactions(oldTransactions =>
+        oldTransactions.filter(transaction => transaction.id !== id),
+      );
+
+      setBalance(formattedNewBalance);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <>
       <Header />
@@ -97,6 +122,7 @@ const Dashboard: React.FC = () => {
                 <th>Preço</th>
                 <th>Categoria</th>
                 <th>Data</th>
+                <th> </th>
               </tr>
             </thead>
 
@@ -111,6 +137,14 @@ const Dashboard: React.FC = () => {
                   </td>
                   <td>{transaction.category.title}</td>
                   <td>{transaction.formattedDate}</td>
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteTransaction(transaction.id)}
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
